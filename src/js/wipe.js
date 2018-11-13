@@ -7,43 +7,44 @@
 		context.fillRect(0,0,_w,_h);
 		context.globalCompositeOperation = "destination-out";
 	}
-	function drawarc(context,moveX,moveY){
-	console.log("传递的实参个数"+arguments.length);
-	context.beginPath();
-	context.fillStyle="red";
-	context.arc(moveX,moveY,radius,0,2*Math.PI);
-	context.fill();
-	context.restore();
-}
-	// function draw(context,a,b,c,d){
-	// 	if(arguments.length==3){
-	// 		context.beginPath();
-	// 		context.fillStyle="red";
-	// 		context.arc(a,b,radius,0,2*Math.PI);
-	// 		context.fill();
-	// 		context.restore();
-	// 	}else{
-	// 		context.save();
-	// 		context.beginPath();
-	// 		context.moveTo(a,b);
-	// 		context.lineTo(c,d);
-	// 		context.lineCap = "round";
-	// 		context.lineWidth = radius*2;
-	// 		context.stroke();
-	// 		context.restore();
-	// 	}
-	// }
-	function drawLine(context,one,two,three,four){
-		console.log(arguments.length);
-		context.save();
-		context.beginPath();
-		context.moveTo(one,two);
-		context.lineTo(three,four);
-		context.lineCap = "round";
-		context.lineWidth = radius*2;
-		context.stroke();
-		context.restore();
+// 	function drawarc(context,moveX,moveY){
+// 	console.log("传递的实参个数"+arguments.length);
+// 	context.beginPath();
+// 	context.fillStyle="red";
+// 	context.arc(moveX,moveY,radius,0,2*Math.PI);
+// 	context.fill();
+// 	context.restore();
+// }
+	function draw(context,a,b,c,d){
+		if(arguments.length==3){
+			context.save();
+			context.beginPath();
+			context.fillStyle="red";
+			context.arc(a,b,radius,0,2*Math.PI);
+			context.fill();
+			context.restore();
+		}else{
+			context.save();
+			context.beginPath();
+			context.moveTo(a,b);
+			context.lineTo(c,d);
+			context.lineCap = "round";
+			context.lineWidth = radius*2;
+			context.stroke();
+			context.restore();
+		}
 	}
+	// function drawLine(context,one,two,three,four){
+	// 	console.log(arguments.length);
+	// 	context.save();
+	// 	context.beginPath();
+	// 	context.moveTo(one,two);
+	// 	context.lineTo(three,four);
+	// 	context.lineCap = "round";
+	// 	context.lineWidth = radius*2;
+	// 	context.stroke();
+	// 	context.restore();
+	// }
 	//在canvas画布上监听自定义事件"mousedown",调用drawPoint函数
 	var deliaX;
 	var deliaY;
@@ -72,7 +73,7 @@
 		var event = evt || window.enent;
 		deliaX = device ? event.touches[0].clientX : event.clientX;
 		deliaY = device ? event.touches[0].clientY : event.clientY;
-		drawarc(context,deliaX,deliaY);
+		draw(context,deliaX,deliaY);
 	})
 	cas.addEventListener(moveEvt,function(evt){
 		if(isMouseDown == true){
@@ -80,7 +81,7 @@
 			event.preventDefault();
 			var moveX = device ? event.touches[0].clientX : event.clientX;
 			var moveY = device ? event.touches[0].clientY : event.clientY;
-			drawLine(context,deliaX,deliaY,moveX,moveY);
+			draw(context,deliaX,deliaY,moveX,moveY);
 			deliaX=moveX;
 			deliaY=moveY;
 		}else{
