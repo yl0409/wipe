@@ -16,7 +16,7 @@
 // 	context.restore();
 // }
 	function draw(context,a,b,c,d){
-		if(arguments.length==3){
+		if(arguments.length===3){
 			context.save();
 			context.beginPath();
 			context.fillStyle="red";
@@ -74,9 +74,9 @@
 		deliaX = device ? event.touches[0].clientX : event.clientX;
 		deliaY = device ? event.touches[0].clientY : event.clientY;
 		draw(context,deliaX,deliaY);
-	})
+	});
 	cas.addEventListener(moveEvt,function(evt){
-		if(isMouseDown == true){
+		if(isMouseDown === true){
 			var event = evt || window.event;
 			event.preventDefault();
 			var moveX = device ? event.touches[0].clientX : event.clientX;
@@ -87,7 +87,7 @@
 		}else{
 			return false;
 		}
-	})
+	});
 	cas.addEventListener(endEvt,function(evt){
 		isMouseDown=false;
 		var num = [];
@@ -97,7 +97,7 @@
 			clear(context);
 			alert("哈哈哈哈");
 		}
-	})
+	});
 	function getTransparencyPercent(context){
 		var t = 0;
 		var imgData = context.getImageData(0,0,_w,_h);
