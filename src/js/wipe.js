@@ -1,121 +1,135 @@
-	var canvas=document.getElementById("cas");
-	var context=cas.getContext("2d");
-	var _w = cas.width,_h = cas.height;
-	var radius = 20;//画笔的半径
-	function drawMask(context){
-		context.fillStyle = "#666";
-		context.fillRect(0,0,_w,_h);
-		context.globalCompositeOperation = "destination-out";
-	}
-// 	function drawarc(context,moveX,moveY){
-// 	console.log("传递的实参个数"+arguments.length);
-// 	context.beginPath();
-// 	context.fillStyle="red";
-// 	context.arc(moveX,moveY,radius,0,2*Math.PI);
-// 	context.fill();
-// 	context.restore();
-// }
-	function draw(context,a,b,c,d){
-		if(arguments.length===3){
-			context.save();
-			context.beginPath();
-			context.fillStyle="red";
-			context.arc(a,b,radius,0,2*Math.PI);
-			context.fill();
-			context.restore();
-		}else{
-			context.save();
-			context.beginPath();
-			context.moveTo(a,b);
-			context.lineTo(c,d);
-			context.lineCap = "round";
-			context.lineWidth = radius*2;
-			context.stroke();
-			context.restore();
-		}
-	}
-	// function drawLine(context,one,two,three,four){
-	// 	console.log(arguments.length);
-	// 	context.save();
-	// 	context.beginPath();
-	// 	context.moveTo(one,two);
-	// 	context.lineTo(three,four);
-	// 	context.lineCap = "round";
-	// 	context.lineWidth = radius*2;
-	// 	context.stroke();
-	// 	context.restore();
-	// }
-	//在canvas画布上监听自定义事件"mousedown",调用drawPoint函数
-	var deliaX;
-	var deliaY;
-	var isMouseDown = false;
-	//如果true执行鼠标移动事件，鼠标按下等于true,鼠标抬起等于false
+	/*
+	author:1104413312@qq.com
+	data:2018-11-16
+	 */
+	function Wipe(obj){
+		this.conID = obj.id;
+		this.cas=document.getElementById(this.conID);
+		this.context=this.cas.getContext("2d");
+		this._w = obj.imW;
+		this._h = obj.imH;
+		this.cas.width = obj.imW;
+		this.cas.height = obj.imH;
+		this.coverType = obj.coverType;//覆盖的是颜色还是图片
+		// this.color = obj.color? "#123" : obj.color;//覆盖的颜色
+		this.color = obj.color || "#777";
+		this.imgUrl = obj.imgUrl;//覆盖图
+		this.bg = obj.bg;//背景图
+		this.radius = obj.radius;//画笔的半径
+		this.deliaX = 0;
+		this.deliaY = 0;
+		this.isMouseDown = false;
+		this.callback = obj.callback;
+		this.area = obj.area;
+		this.drawT();
+		this.move();
+		this.drawMask();
 
-	var device = (/android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent.toLowerCase()));
-	console.log(navigator.userAgent);
-	console.log(device);
-	// var startEvt,moveEvt,endEvt;
-	// if(device == true){
-	// 	startEvt = "touchstart";
-	// 	moveEvt = "touchmove";
-	// 	endEvt = "touchend";
-	// }else{
-	// 	startEvt = "mousedown";
-	// 	moveEvt = "mousemove";
-	// 	endEvt = "mouseup";
-	// }
-	var startEvt = device ? "touchstart" : "mousedown";
-	var moveEvt = device ? "touchmove" : "mousemove";
-	var endEvt = device ? "touchend" : "mouseup";
-
-	cas.addEventListener(startEvt,function(evt){
-		isMouseDown = true;
-		var event = evt || window.enent;
-		deliaX = device ? event.touches[0].clientX : event.clientX;
-		deliaY = device ? event.touches[0].clientY : event.clientY;
-		draw(context,deliaX,deliaY);
-	});
-	cas.addEventListener(moveEvt,function(evt){
-		if(isMouseDown === true){
-			var event = evt || window.event;
-			event.preventDefault();
-			var moveX = device ? event.touches[0].clientX : event.clientX;
-			var moveY = device ? event.touches[0].clientY : event.clientY;
-			draw(context,deliaX,deliaY,moveX,moveY);
-			deliaX=moveX;
-			deliaY=moveY;
+	}
+	//drawT画点和画线函数
+	//参数：如果只有两个参数，函数功能画圆，a,b即原点的中心坐标
+	//如果传递四个参数，函数功能画线，a,b为起始坐标,c,d为结束坐标
+	Wipe.prototype.drawT = function(a,b,c,d){
+		if(arguments.length===2){
+			this.context.save();
+			this.context.beginPath();
+			this.context.fillStyle="red";
+			this.context.arc(a,b,this.radius,0,2*Math.PI);
+			this.context.fill();
+			this.context.restore();
 		}else{
-			return false;
+			this.context.save();
+			this.context.beginPath();
+			this.context.moveTo(a,b);
+			this.context.lineTo(c,d);
+			this.context.lineCap = "round";
+			this.context.lineWidth = this.radius*2;
+			this.context.stroke();
+			this.context.restore();
 		}
-	});
-	cas.addEventListener(endEvt,function(evt){
-		isMouseDown=false;
-		var num = [];
-		var imgdata = context.getImageData(0,0,cas.width,cas.height);
-		// console.log(imgdata);
-		if(getTransparencyPercent(context) >= 60){
-			clear(context);
-			alert("哈哈哈哈");
-		}
-	});
-	function getTransparencyPercent(context){
+	};
+	Wipe.prototype.getTransparencyPercent = function(){
 		var t = 0;
-		var imgData = context.getImageData(0,0,_w,_h);
+		var imgData = this.context.getImageData(0,0,this._w,this._h);
 		for(var i =0;i<imgData.data.length;i+=4){
 			var a = imgData.data[i+3];
 			if(a === 0){
 				t++;
 			}
 		}
-		var percent = (t / (_w*_h)*100);
-		return Math.round(percent);
-	}
-	function clear(context){
-		context.clearRect(0,0,_w,_h);
-	}
-	window.onload = function(){
-		drawMask(context);
-		// drawLine(context)
-		isMouseDown=false;
-		// drawArc(context);
+		this.percent = (t / (this._w*this._h))*100;
+		return Math.round(this.percent);
 	};
+	Wipe.prototype.clearRect = function(){
+		this.context.clearRect(0,0,this._w,this._h);
+	};
+	Wipe.prototype.drawMask = function(){
+		var that = this;
+		if(this.coverType === "color"){
+			this.context.fillStyle = this.color;
+			this.context.fillRect(0,0,this._w,this._h);
+			this.context.globalCompositeOperation = "destination-out";
+		}else if(this.coverType === "image"){
+			//将imgUrl指定的图片填充画布
+			this.img1 = new Image();
+			this.img1.src = this.imgUrl;
+			console.log(this.img1);
+			this.img1.onload = function(){
+				that.context.drawImage(that.img1,0,0,that.img1.width,that.img1.height,0,0,that._w,that._h);
+				that.context.globalCompositeOperation = "destination-out";
+			};
+		}
+	};
+	Wipe.prototype.move = function(){
+		var that = this;
+		this.device = (/android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent.toLowerCase()));
+		this.startEvt = this.device ? "touchstart" : "mousedown";
+		this.moveEvt = this.device ? "touchmove" : "mousemove";
+		this.endEvt = this.device ? "touchend" : "mouseup";
+		var scrollLeft;
+		var scrollTop;
+		var allLeft = this.cas.offsetLeft;
+		var allTop = this.cas.offsetTop;
+		var currentObj = this.cas;
+		while(currentObj = currentObj.offsetParent){
+				allTop += currentObj.offsetTop;
+				allLeft += currentObj.offsetLeft;
+			}
+		this.cas.addEventListener(that.startEvt,function(evt){
+			that.isMouseDown = true;
+			var event = evt || window.event;
+			scrollLeft = document.body.scrollLeft || document.documentElement.scrollLeft;
+			scrollTop = document.body.scrollTop || document.documentElement.scrollTop;
+			that.deliaX = that.device ? event.touches[0].clientX - allLeft + scrollLeft : event.clientX - allLeft + scrollLeft;
+			that.deliaY = that.device ? event.touches[0].clientY - allTop + scrollTop : event.clientY - allTop + scrollTop;
+			that.drawT(that.deliaX,that.deliaY);
+		});
+		this.cas.addEventListener(that.moveEvt,function(evt){
+			if(that.isMouseDown === true){
+				var event = evt || window.event;
+				scrollLeft = document.body.scrollLeft || document.documentElement.scrollLeft;
+				scrollTop = document.body.scrollTop || document.documentElement.scrollTop;
+				event.preventDefault();
+				var moveX = that.device ? event.touches[0].clientX - allLeft + scrollLeft : event.clientX - allLeft + scrollLeft;
+				var moveY = that.device ? event.touches[0].clientY - allTop + scrollTop : event.clientY - allTop + scrollTop;
+				that.drawT(that.deliaX,that.deliaY,moveX,moveY);
+				that.deliaX=moveX;
+				that.deliaY=moveY;
+			}else{
+				return false;
+			}
+		});
+		this.cas.addEventListener(that.endEvt,function(evt){
+			that.isMouseDown=false;
+			//借用外部的处理函数
+			var percent = that.getTransparencyPercent();
+			// 调用同名的全局函数
+			that.callback.call(window,percent);
+			var imgdata = that.context.getImageData(0,0,that.cas.width,that.cas.height);
+			if(percent >= that.area){
+				that.clearRect();
+			}
+		});
+	};
+
+

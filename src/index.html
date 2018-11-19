@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
 	<meta charset="UTF-8">
 	<title>wipe 组件</title>
 	<style>
@@ -15,10 +16,37 @@
 			background:url(image/wipe1.jpg) center 0 no-repeat;
 			background-size: cover;
 		}
+		#casd{
+			border:1px solid #000;
+			background:url(image/wipe1.jpg) center 0 no-repeat;
+			background-size: cover;
+		}
 	</style>
 </head>
 <body>
 	<canvas id="cas" width="375" height="667"></canvas>
+	<canvas id="casd" width="375" height="667"></canvas>
 </body>
 </html>
-<script src="../dist/js/wipe-0.0.1.min.js"></script>
+<script src="js/wipe.js"></script>
+<script>
+
+	var init = {
+		id:"cas",
+		coverType:"color",
+		color:"yellow",
+		imgUrl:"image/wipe2.jpg",
+		bg:"image/bg.jpg",
+		imW:200,
+		imH:200,
+		radius:"5",
+		callback:wipeCallback,//用户自定义回调函数名称
+		area:60
+	}
+	var cas01 = new Wipe(init);
+	function wipeCallback(percent){
+		if(percent > 60){
+			console.log("透明面积超过60%,查看底图");
+		}
+	}
+</script>
