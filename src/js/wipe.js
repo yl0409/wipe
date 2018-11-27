@@ -21,6 +21,7 @@
 		this.isMouseDown = false;
 		this.callback = obj.callback;
 		this.area = obj.area;
+		this.txt = obj.txt;
 		this.drawT();
 		this.move();
 		this.drawMask();
@@ -69,6 +70,13 @@
 			this.context.fillStyle = this.color;
 			this.context.fillRect(0,0,this._w,this._h);
 			this.context.globalCompositeOperation = "destination-out";
+		}else if(this.coverType === "txt"){
+			this.context.fillStyle = this.color;   // 文字填充颜色
+			this.context.fillRect(0,0,this._w,this._h);
+			this.context.globalCompositeOperation = "destination-out";
+	        this.context.font = '30px Adobe Ming Std';
+	        this.context.fillText(this.txt,20,200);
+	        this.context.stroke();
 		}else if(this.coverType === "image"){
 			//将imgUrl指定的图片填充画布
 			this.img1 = new Image();
@@ -77,8 +85,9 @@
 			this.img1.onload = function(){
 				that.context.drawImage(that.img1,0,0,that.img1.width,that.img1.height,0,0,that._w,that._h);
 				that.context.globalCompositeOperation = "destination-out";
-			};
+			}
 		}
+
 	};
 	Wipe.prototype.move = function(){
 		var that = this;
